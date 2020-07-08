@@ -31,7 +31,7 @@ impl OutputPin for LHandle {
 /// * `data_pin` number of GPIO pin used as data pin
 /// * `clk_pin` number of GPIO pin used as clock pin
 /// * `cs_pin` number of GPIO pin used as cs (chip select) pin
-pub fn setup(gpio_dev: &str, num_displays: usize, data_pin: u32, clk_pin: u32, cs_pin: u32) -> Max7219 {
+pub fn setup(gpio_dev: &str, num_displays: usize, data_pin: u32, cs_pin: u32, clk_pin: u32) -> Max7219 {
     let mut gpio = Chip::new(gpio_dev).unwrap();
     let data_pin = gpio
         .get_line(data_pin).unwrap()
