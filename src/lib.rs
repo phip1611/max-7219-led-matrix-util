@@ -6,6 +6,7 @@ use crate::setup::Max7219;
 use crate::encoding::encode_string;
 use std::thread::sleep;
 use std::time::Duration;
+use max7219::DecodeMode;
 
 /// We use 8x8 square matrices (per single display)
 pub const LED_SQUARE_MATRIX_DIM: usize = 8;
@@ -57,16 +58,18 @@ pub fn shift_all_rows_one_bit_left(moving_bits: &mut Vec<SingleDisplayData>/*, r
 /// * `ms_sleep` - timeout after each iteration
 /// * `intensity` - brightness for the display; value between `0x00` and `0x0F`
 pub fn shop_moving_text_in_loop(display: &mut Max7219, text: &str, display_count: usize, ms_sleep: u64, intensity: u8) {
-    let displays = display_count % MAX_DISPLAYS;
+    let display_count = display_count % MAX_DISPLAYS;
 
     display.power_on().unwrap();
-    for i in 0..displays {
+    for i in 0..display_count {
+        display.set_decode_mode(i, DecodeMode::NoDecode);
+        display.clear_display(i);
         display.set_intensity(i, intensity);
     }
 
     let mut bits = encode_string(text);
     loop {
-        for i in 0..displays {
+        for i in 0..display_count {
             display.write_raw(i, &bits[i]).unwrap();
         }
 
