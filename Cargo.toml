@@ -10,7 +10,7 @@ exclude = [
 ]
 keywords = ["gpio", "max7219"]
 categories = ["embedded", "hardware-support" ]
-description = "Utility library for LED matrix displays using the MAX7219 microcontroller written in Rust for Linux (Raspberry Pi).."
+description = "Utility library for LED matrix displays using the MAX7219 microcontroller written in Rust for Linux (Raspberry Pi)."
 readme = "README.md"
 license = "MIT"
 homepage = "https://github.com/phip1611/max-7219-led-matrix-util"
