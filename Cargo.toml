@@ -1,6 +1,6 @@
 [package]
 name = "max-7219-led-matrix-util"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Philipp Schuster <phip1611@gmail.com>"]
 edition = "2018"
 exclude = [

@@ -47,7 +47,7 @@ checksum = "a9f8082297d534141b30c8d39e9b1773713ab50fdbe4ff30f750d063b3bfd701"
 
 [[package]]
 name = "max-7219-led-matrix-util"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "embedded-hal",
  "gpio-cdev",
