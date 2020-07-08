@@ -50,14 +50,15 @@ pub fn shift_all_rows_one_bit_left(moving_bits: &mut Vec<SingleDisplayData>/*, r
     }
 }
 
-/// Shows a moving text in loop. After each iteration all bits are shifted one col to the left.
+/// Convenient function that turns on the display, clears the display
+/// and sets the brightness to the highest possible value. It also sets
+/// the DecodeMode to NoDecode which is necessary for displaying content on
+/// the 8x8 matrix display. (Max7219 can also be used for 7 segment displays).
 ///
 /// * `display` - mutable reference to Max7219 display driver
-/// * `text` - the text to display
 /// * `display_count` - count of displays connected to the MAX7219
-/// * `ms_sleep` - timeout after each iteration
 /// * `intensity` - brightness for the display; value between `0x00` and `0x0F`
-pub fn shop_moving_text_in_loop(display: &mut Max7219, text: &str, display_count: usize, ms_sleep: u64, intensity: u8) {
+pub fn prepare_display(display: &mut Max7219, display_count: usize, intensity: u8) {
     let display_count = display_count % MAX_DISPLAYS;
 
     display.power_on().unwrap();
@@ -66,6 +67,17 @@ pub fn shop_moving_text_in_loop(display: &mut Max7219, text: &str, display_count
         display.clear_display(i);
         display.set_intensity(i, intensity);
     }
+}
+
+/// Shows a moving text in loop. After each iteration all bits are shifted one col to the left.
+/// **Make sure to call `prepare_display()` first!**
+///
+/// * `display` - mutable reference to Max7219 display driver
+/// * `text` - the text to display
+/// * `display_count` - count of displays connected to the MAX7219
+/// * `ms_sleep` - timeout after each iteration
+pub fn shop_moving_text_in_loop(display: &mut Max7219, text: &str, display_count: usize, ms_sleep: u64) {
+    let display_count = display_count % MAX_DISPLAYS;
 
     let mut bits = encode_string(text);
     loop {

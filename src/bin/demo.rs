@@ -2,7 +2,7 @@
 //! (https://www.az-delivery.de/products/4-x-64er-led-matrix-display).
 
 use max_7219_led_matrix_util::setup::setup;
-use max_7219_led_matrix_util::shop_moving_text_in_loop;
+use max_7219_led_matrix_util::{shop_moving_text_in_loop, prepare_display};
 
 const NUM_DISPLAYS: usize = 4;
 
@@ -23,5 +23,6 @@ fn main() {
     println!("data={}, cs={}, clk={}", data_pin, cs_pin, clk_pin);
 
     let mut display = setup("/dev/gpiochip0", NUM_DISPLAYS, data_pin, cs_pin, clk_pin);
-    shop_moving_text_in_loop(&mut display, "HELLO 01 ABCDEF", NUM_DISPLAYS, 50, 0x0F);
+    prepare_display(&mut display, NUM_DISPLAYS, 0x0F); // already done inside shop_moving_text_in_loop() :)
+    shop_moving_text_in_loop(&mut display, "HELLO 01 ABCDEF", NUM_DISPLAYS, 50);
 }
