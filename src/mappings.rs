@@ -103,17 +103,26 @@ pub const CAP_L: SingleDisplayData = [
         0b01000000,
         0b01111100,
     ];
-pub const CAP_M: SingleDisplayData = [0; 8]; // TODO
+pub const CAP_M: SingleDisplayData = [
+    0b10000010,
+    0b11000110,
+    0b10101010,
+    0b10111010,
+    0b10010010,
+    0b10000010,
+    0b10000010,
+    0b10000010,
+];
 pub const CAP_N: SingleDisplayData = [
-        0b01000100,
-        0b01100100,
-        0b01110100,
-        0b01010100,
-        0b01011100,
-        0b01001100,
-        0b01001100,
-        0b01000100,
-    ];
+    0b01000100,
+    0b01100100,
+    0b01110100,
+    0b01010100,
+    0b01011100,
+    0b01001100,
+    0b01001100,
+    0b01000100,
+];
 pub const CAP_O: SingleDisplayData = [
     0b00011000,
     0b00100100,
@@ -124,18 +133,27 @@ pub const CAP_O: SingleDisplayData = [
     0b00100100,
     0b00011000,
 ];
-pub const CAP_P: SingleDisplayData = [0; 8]; // TODO
+pub const CAP_P: SingleDisplayData = [
+    0b01111000,
+    0b01000100,
+    0b01000100,
+    0b01000100,
+    0b01111000,
+    0b01000000,
+    0b01000000,
+    0b01000000,
+];
 pub const CAP_Q: SingleDisplayData = [0; 8]; // TODO
 pub const CAP_R: SingleDisplayData = [
-        0b01111000,
-        0b01000100,
-        0b01000100,
-        0b01111000,
-        0b01100000,
-        0b01010000,
-        0b01001000,
-        0b01000100
-    ];
+    0b01111000,
+    0b01000100,
+    0b01000100,
+    0b01111000,
+    0b01100000,
+    0b01010000,
+    0b01001000,
+    0b01000100
+];
 pub const CAP_S: SingleDisplayData = [
     0b00011100,
     0b00100000,
@@ -148,30 +166,30 @@ pub const CAP_S: SingleDisplayData = [
 ];
 pub const CAP_T: SingleDisplayData = [0; 8]; // TODO
 pub const CAP_U: SingleDisplayData = [
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b00111100,
-    ];
+    0b01000010,
+    0b01000010,
+    0b01000010,
+    0b01000010,
+    0b01000010,
+    0b01000010,
+    0b01000010,
+    0b00111100,
+];
 pub const CAP_V: SingleDisplayData = [0; 8]; // TODO
 pub const CAP_W: SingleDisplayData = [0; 8]; // TODO
 pub const CAP_X: SingleDisplayData = [0; 8]; // TODO
 pub const CAP_Y: SingleDisplayData = [0; 8]; // TODO
 pub const CAP_Z: SingleDisplayData = [0; 8]; // TODO
 pub const ZERO: SingleDisplayData = [
-        0b00111000,
-        0b01000100,
-        0b01000100,
-        0b01000100,
-        0b01000100,
-        0b01000100,
-        0b01000100,
-        0b00111000,
-    ];
+    0b00111000,
+    0b01000100,
+    0b01000100,
+    0b01000100,
+    0b01000100,
+    0b01000100,
+    0b01000100,
+    0b00111000,
+];
 pub const ONE: SingleDisplayData = [
     0b00000100,
     0b00011100,

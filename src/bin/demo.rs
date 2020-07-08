@@ -24,5 +24,5 @@ fn main() {
 
     let mut display = setup("/dev/gpiochip0", NUM_DISPLAYS, data_pin, cs_pin, clk_pin);
     prepare_display(&mut display, NUM_DISPLAYS, 0x0F);
-    shop_moving_text_in_loop(&mut display, "HELLO 01 ABCDEF    ", NUM_DISPLAYS, 50);
+    shop_moving_text_in_loop(&mut display, "HELLO 01 ABCDEF MAPA   ", NUM_DISPLAYS, 50);
 }
