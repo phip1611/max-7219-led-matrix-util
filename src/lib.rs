@@ -63,9 +63,9 @@ pub fn prepare_display(display: &mut Max7219, display_count: usize, intensity: u
 
     display.power_on().unwrap();
     for i in 0..display_count {
-        display.set_decode_mode(i, DecodeMode::NoDecode);
-        display.clear_display(i);
-        display.set_intensity(i, intensity);
+        display.set_decode_mode(i, DecodeMode::NoDecode).unwrap();
+        display.clear_display(i).unwrap();
+        display.set_intensity(i, intensity).unwrap();
     }
 }
 
