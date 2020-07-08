@@ -6,6 +6,7 @@ edition = "2018"
 exclude = [
     "demo.gif",
     "demo.mp4",
+    ".travis.yml",
 ]
 keywords = ["gpio", "max7219"]
 categories = ["embedded", "hardware-support" ]
