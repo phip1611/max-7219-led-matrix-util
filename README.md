@@ -38,3 +38,7 @@ fn main() {
 
 `max_7219_led_matrix_util::setup::setup` returns an instance of a struct defined by crate `max7219` (the actual device driver).
 Therefore you can work directly on this driver too without the need of the utility functions. Like `display.write_raw()`.
+
+
+### Thanks to
+Thanks to the creators of "max7219"-crate! :)
