@@ -1,0 +1,23 @@
+[package]
+name = "max-7219-led-matrix-util"
+version = "0.1.0"
+authors = ["Philipp Schuster <phip1611@gmail.com>"]
+edition = "2018"
+exclude = [
+    "demo.gif",
+    "demo.mp4",
+]
+keywords = ["gpio", "max7219"]
+categories = ["embedded", "hardware-support" ]
+description = "Utility library for LED matrix displays using the MAX7219 microcontroller written in Rust for Linux (Raspberry Pi).."
+readme = "README.md"
+license = "MIT"
+homepage = "https://github.com/phip1611/max-7219-led-matrix-util"
+repository = "https://github.com/phip1611/max-7219-led-matrix-util"
+documentation = "https://docs.rs/max-7219-led-matrix-util/"
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+gpio-cdev = "0.3.0"
+embedded-hal = "0.2.4"
+max7219 = "0.2.2"
