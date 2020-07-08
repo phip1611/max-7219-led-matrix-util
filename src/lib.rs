@@ -50,8 +50,19 @@ pub fn shift_all_rows_one_bit_left(moving_bits: &mut Vec<SingleDisplayData>/*, r
 }
 
 /// Shows a moving text in loop. After each iteration all bits are shifted one col to the left.
-pub fn shop_moving_text_in_loop(display: &mut Max7219, text: &str, displays: usize, ms_sleep: u64) {
-    let displays = displays % MAX_DISPLAYS;
+///
+/// * `display` - mutable reference to Max7219 display driver
+/// * `text` - the text to display
+/// * `display_count` - count of displays connected to the MAX7219
+/// * `ms_sleep` - timeout after each iteration
+/// * `intensity` - brightness for the display; value between `0x00` and `0x0F`
+pub fn shop_moving_text_in_loop(display: &mut Max7219, text: &str, display_count: usize, ms_sleep: u64, intensity: u8) {
+    let displays = display_count % MAX_DISPLAYS;
+
+    for i in 0..displays {
+        display.set_intensity(i, intensity);
+    }
+
     let mut bits = encode_string(text);
     loop {
         for i in 0..displays {
