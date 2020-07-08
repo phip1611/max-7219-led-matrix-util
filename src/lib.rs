@@ -59,6 +59,7 @@ pub fn shift_all_rows_one_bit_left(moving_bits: &mut Vec<SingleDisplayData>/*, r
 pub fn shop_moving_text_in_loop(display: &mut Max7219, text: &str, display_count: usize, ms_sleep: u64, intensity: u8) {
     let displays = display_count % MAX_DISPLAYS;
 
+    display.power_on().unwrap();
     for i in 0..displays {
         display.set_intensity(i, intensity);
     }
