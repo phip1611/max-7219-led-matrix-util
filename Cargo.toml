@@ -1,6 +1,6 @@
 [package]
 name = "max-7219-led-matrix-util"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Philipp Schuster <phip1611@gmail.com>"]
 edition = "2018"
 exclude = [
@@ -9,8 +9,8 @@ exclude = [
     ".travis.yml",
 ]
 keywords = ["gpio", "max7219", "ledcontrol"]
-categories = ["embedded", "hardware-support" ]
-description = "Utility library using 'max7219'-crate for LED matrix displays written in Rust for Linux (Raspberry Pi). The main purpose is educational."
+categories = ["hardware-support" ]
+description = "Utility library using 'max7219'-crate for LED matrix displays for Linux (Raspberry Pi). The main purpose is educational."
 readme = "README.md"
 license = "MIT"
 homepage = "https://github.com/phip1611/max-7219-led-matrix-util"
