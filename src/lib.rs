@@ -1,11 +1,26 @@
 //! Provides utility functions on top of "max7219"-crate to display data (like text) on a
 //! MAX7219 powered matrix display.
 
-use crate::mappings::SingleDisplayData;
+#![allow(dead_code)]
+#![allow(unused_imports)]
+
+#![cfg_attr(not(feature = "std"), no_std)]
+#[cfg(not(feature = "std"))]
+extern crate alloc;
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
+
+#[cfg(feature = "std")]
 use crate::setup::Max7219;
+
+#[cfg(feature = "std")]
+use std::{
+    thread::sleep,
+    time::Duration
+};
+
+use crate::mappings::SingleDisplayData;
 use crate::encoding::encode_string;
-use std::thread::sleep;
-use std::time::Duration;
 use max7219::DecodeMode;
 
 /// We use 8x8 square matrices (per single display)
@@ -16,13 +31,19 @@ pub const MAX_DISPLAYS: usize = 16;
 
 pub mod mappings;
 pub mod encoding;
-pub mod setup;
+#[cfg(feature = "std")]
+mod setup;
+#[cfg(feature = "std")]
+pub use setup::{
+    setup as setup_adapter,
+    Max7219 as Max7219Adapter
+};
 
 /// Shift all row bits one to the left (to the next col). This way you can animate a moving text.
 ///
 /// * `moving_bits` Vector with the data of all content to display. Each index describes
 ///                 the 8x8 bit data for a single display.
-// * `repeat` shift 1 bits on the very left to the ending of the vector. Without repeat
+/// * `repeat` shift 1 bits on the very left to the ending of the vector. Without repeat
 //            the vector will be all zeros after enough iterations.
 pub fn shift_all_rows_one_bit_left(moving_bits: &mut Vec<SingleDisplayData>/*, repeat: bool*/) {
     // move all bits to next position
@@ -58,6 +79,7 @@ pub fn shift_all_rows_one_bit_left(moving_bits: &mut Vec<SingleDisplayData>/*, r
 /// * `display` - mutable reference to Max7219 display driver
 /// * `display_count` - count of displays connected to the MAX7219
 /// * `intensity` - brightness for the display; value between `0x00` and `0x0F`
+#[cfg(feature = "std")]
 pub fn prepare_display(display: &mut Max7219, display_count: usize, intensity: u8) {
     let display_count = display_count % MAX_DISPLAYS;
 
@@ -76,6 +98,7 @@ pub fn prepare_display(display: &mut Max7219, display_count: usize, intensity: u
 /// * `text` - the text to display
 /// * `display_count` - count of displays connected to the MAX7219
 /// * `ms_sleep` - timeout after each iteration
+#[cfg(feature = "std")]
 pub fn shop_moving_text_in_loop(display: &mut Max7219, text: &str, display_count: usize, ms_sleep: u64) {
     let display_count = display_count % MAX_DISPLAYS;
 
