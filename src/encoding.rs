@@ -56,5 +56,5 @@ pub fn encode_char(c: char) -> SingleDisplayData {
 /// bit shift all rows one to the left per iteration. This way you get a smooth transition/animation.
 /// Don't forget about the sleep-timeout per iteration!
 pub fn encode_string(s: &str) -> Vec<SingleDisplayData> {
-    s.chars().into_iter().map(|c| encode_char(c)).collect()
+    s.chars().into_iter().map(encode_char).collect()
 }

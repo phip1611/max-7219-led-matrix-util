@@ -61,7 +61,7 @@ pub fn shift_all_rows_one_bit_left(moving_bits: &mut Vec<SingleDisplayData>, /*,
                 }
             }
             // shift all in row on to the left
-            moving_bits[display_i][row_i] = moving_bits[display_i][row_i] << 1;
+            moving_bits[display_i][row_i] <<= 1;
         }
     }
 }
