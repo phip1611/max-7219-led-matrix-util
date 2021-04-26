@@ -18,7 +18,7 @@ max-7219-led-matrix-util = { version = "<latest-version>", default-features = fa
 ![demo](demo.gif)
 
 ## Usage example (`std`)
-```
+```rust
 use max_7219_led_matrix_util::setup_adapter;
 use max_7219_led_matrix_util::{shop_moving_text_in_loop, prepare_display};
 
