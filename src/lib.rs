@@ -241,7 +241,7 @@ pub fn transpose_single_display_data(data: SingleDisplayData) -> SingleDisplayDa
         }
         transposed_data[col_i] = col;
     }
-    data
+    transposed_data
 }
 
 #[cfg(test)]
