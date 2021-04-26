@@ -2,7 +2,7 @@
 //! (https://www.az-delivery.de/products/4-x-64er-led-matrix-display).
 
 use max_7219_led_matrix_util::setup_adapter;
-use max_7219_led_matrix_util::{prepare_display, shop_moving_text_in_loop};
+use max_7219_led_matrix_util::{prepare_display, show_moving_text_in_loop};
 
 const NUM_DISPLAYS: usize = 4;
 
@@ -26,5 +26,5 @@ fn main() {
 
     let mut display = setup_adapter("/dev/gpiochip0", NUM_DISPLAYS, data_pin, cs_pin, clk_pin);
     prepare_display(&mut display, NUM_DISPLAYS, 0x0F);
-    shop_moving_text_in_loop(&mut display, "HELLO 01 ABCDEF MAPA   ", NUM_DISPLAYS, 50);
+    show_moving_text_in_loop(&mut display, "HELLO 01 ABCDEF MAPA   ", NUM_DISPLAYS, 50);
 }

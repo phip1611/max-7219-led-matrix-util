@@ -94,7 +94,7 @@ pub fn prepare_display(display: &mut Max7219, display_count: usize, intensity: u
 /// * `display_count` - count of displays connected to the MAX7219
 /// * `ms_sleep` - timeout after each iteration
 #[cfg(feature = "std")]
-pub fn shop_moving_text_in_loop(
+pub fn show_moving_text_in_loop(
     display: &mut Max7219,
     text: &str,
     display_count: usize,
