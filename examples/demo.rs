@@ -2,14 +2,16 @@
 //! (https://www.az-delivery.de/products/4-x-64er-led-matrix-display).
 
 use max_7219_led_matrix_util::setup_adapter;
-use max_7219_led_matrix_util::{shop_moving_text_in_loop, prepare_display};
+use max_7219_led_matrix_util::{prepare_display, shop_moving_text_in_loop};
 
 const NUM_DISPLAYS: usize = 4;
 
 fn main() {
     println!("Demo for the 4-display device by AzDelivery. This is the device in the gif in the README.md.");
     println!();
-    println!("Provide 3 pins (gpio pin nums) please and connect all to the device: <data> <cs> <clk>");
+    println!(
+        "Provide 3 pins (gpio pin nums) please and connect all to the device: <data> <cs> <clk>"
+    );
     println!("for example: '12 16 21'");
     println!();
 

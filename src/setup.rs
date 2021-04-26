@@ -1,7 +1,7 @@
-use gpio_cdev::{Chip, LineHandle, LineRequestFlags};
 use embedded_hal::digital::v2::OutputPin;
-use max7219::MAX7219;
+use gpio_cdev::{Chip, LineHandle, LineRequestFlags};
 use max7219::connectors::PinConnector;
+use max7219::MAX7219;
 
 /// The type of the driver.
 pub type Max7219 = MAX7219<PinConnector<LHandle, LHandle, LHandle>>;
@@ -31,17 +31,29 @@ impl OutputPin for LHandle {
 /// * `data_pin` number of GPIO pin used as data pin
 /// * `clk_pin` number of GPIO pin used as clock pin
 /// * `cs_pin` number of GPIO pin used as cs (chip select) pin
-pub fn setup(gpio_dev: &str, num_displays: usize, data_pin: u32, cs_pin: u32, clk_pin: u32) -> Max7219 {
+pub fn setup(
+    gpio_dev: &str,
+    num_displays: usize,
+    data_pin: u32,
+    cs_pin: u32,
+    clk_pin: u32,
+) -> Max7219 {
     let mut gpio = Chip::new(gpio_dev).unwrap();
     let data_pin = gpio
-        .get_line(data_pin).unwrap()
-        .request(LineRequestFlags::OUTPUT, 0, "spi-data-pin").unwrap();
+        .get_line(data_pin)
+        .unwrap()
+        .request(LineRequestFlags::OUTPUT, 0, "spi-data-pin")
+        .unwrap();
     let cs_pin = gpio
-        .get_line(cs_pin).unwrap()
-        .request(LineRequestFlags::OUTPUT, 0, "spi-cs-pin").unwrap();
+        .get_line(cs_pin)
+        .unwrap()
+        .request(LineRequestFlags::OUTPUT, 0, "spi-cs-pin")
+        .unwrap();
     let clk_pin = gpio
-        .get_line(clk_pin).unwrap()
-        .request(LineRequestFlags::OUTPUT, 0, "spi-clk-pin").unwrap();
+        .get_line(clk_pin)
+        .unwrap()
+        .request(LineRequestFlags::OUTPUT, 0, "spi-clk-pin")
+        .unwrap();
 
     let data_pin = LHandle(data_pin);
     let clk_pin = LHandle(clk_pin);

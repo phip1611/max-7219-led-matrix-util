@@ -45,7 +45,7 @@ pub fn encode_char(c: char) -> SingleDisplayData {
         '.' => DOT,
         '!' => EXCLAMATION_MARK,
 
-        ' ' | _ => SPACE
+        ' ' | _ => SPACE,
     }
 }
 
@@ -55,6 +55,6 @@ pub fn encode_char(c: char) -> SingleDisplayData {
 /// So if you have 4 displays and 10 chars then you could only display indices zero to three and
 /// bit shift all rows one to the left per iteration. This way you get a smooth transition/animation.
 /// Don't forget about the sleep-timeout per iteration!
-pub fn encode_string(s: &str) -> Vec<SingleDisplayData>  {
+pub fn encode_string(s: &str) -> Vec<SingleDisplayData> {
     s.chars().into_iter().map(|c| encode_char(c)).collect()
 }
