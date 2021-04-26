@@ -120,6 +120,54 @@ fn remove_letter_spacing(_moving_bits: &mut Vec<SingleDisplayData>) {
     unimplemented!(); // TODO!
 }
 
+/// This does a transpose operation on the `SingleDisplayData`-Matrix and is a helper function for
+/// [`remove_letter_spacing`]. Cols become rows and rows become cols.
+/// Example:
+/// ```
+/// let _ = [
+///     0b10000000,
+///     0b10000000,
+///     0b10000000,
+///     0b10000000,
+///     0b10000000,
+///     0b10000000,
+///     0b10000000,
+///     0b10000000,
+///     0b10000000,
+/// ];
+/// ```
+/// becomes
+/// ```
+/// let _ = [
+/// 0b11111111,
+/// 0,
+/// 0,
+/// 0,
+/// 0,
+/// 0,
+/// 0,
+/// 0,
+/// ];
+/// ```
+pub fn transpose_single_display_data_mut(data: &mut SingleDisplayData) {
+    let mut transposed_data: SingleDisplayData = [0; 8];
+    for col_i in 0..8 {
+        // the data/bits of the current col
+        let mut col = 0;
+        for row_i in 0..8 {
+            // we get the current col value (bit) at index "data[row_i][col_i]"
+            // bit by bit. We move the current bit to the lowest index via
+            // bit shifting and do a bitwise and with 1.
+            let col_bit = (data[row_i] >> (7 - col_i)) & 1;
+            // now we first shift all col bits from previous iterations one index
+            // to the left and then we add our current bit to the col at the lowest index.
+            col = (col << 1) | col_bit;
+        }
+        transposed_data[col_i] = col;
+    }
+    *data = transposed_data;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -147,5 +195,40 @@ mod tests {
 
         assert_eq!(first_row_dis_0_actual, first_row_dis_0_expected);
         assert_eq!(first_row_dis_1_actual, first_row_dis_1_expected);
+    }
+
+    #[test]
+    fn test_transpose_single_display_data() {
+        let input = [
+            0b0100_0000,
+            0b0100_0000,
+            0b0100_0000,
+            0b0100_0000,
+            0b0000_0011,
+            0b0000_0011,
+            0b0000_0011,
+            0b0000_0011,
+        ];
+        let expected = [
+            0b0000_0000,
+            0b1111_0000,
+            0b0000_0000,
+            0b0000_0000,
+            0b0000_0000,
+            0b0000_0000,
+            0b0000_1111,
+            0b0000_1111,
+        ];
+
+        let mut actual = input.clone();
+        transpose_single_display_data_mut(&mut actual);
+
+        for i in 0..input.len() {
+            assert_eq!(
+                actual[i], expected[i],
+                "swap_cols_to_rows() doesn't transposed the matrix properly at index {}! is={:#b}, expected={:#b}",
+                i, actual[i], expected[i]
+            );
+        }
     }
 }
