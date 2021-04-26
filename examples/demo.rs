@@ -24,7 +24,16 @@ fn main() {
 
     println!("data={}, cs={}, clk={}", data_pin, cs_pin, clk_pin);
 
+    // display adapter (std-feature, doesn't work in no_std)
     let mut display = setup_adapter("/dev/gpiochip0", NUM_DISPLAYS, data_pin, cs_pin, clk_pin);
     prepare_display(&mut display, NUM_DISPLAYS, 0x0F);
-    show_moving_text_in_loop(&mut display, "HELLO 01 ABCDEF MAPA   ", NUM_DISPLAYS, 50);
+    show_moving_text_in_loop(
+        &mut display,
+        "HELLO 01 ABCDEF MAPA   ",
+        NUM_DISPLAYS,
+        // ms for each animation step
+        50,
+        // max_gap_width
+        2
+    );
 }
