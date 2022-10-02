@@ -110,20 +110,21 @@ pub fn prepare_display(display: &mut Max7219, display_count: usize, intensity: u
 /// * `text` - the text to display
 /// * `display_count` - count of displays connected to the MAX7219
 /// * `ms_sleep` - timeout after each iteration
-/// * `max_gap_width` - set's the maximum width/count of empty cols between characters. Recommended is 2. 0 to deactivate.
+/// * `gap_width` - (optional) set's the maximum width/count of empty cols between characters. 0 to deactivate.
+///                 Downside is that spaces will be removed.
 #[cfg(feature = "std")]
 pub fn show_moving_text_in_loop(
     display: &mut Max7219,
     text: &str,
     display_count: usize,
     ms_sleep: u64,
-    max_gap_width: usize,
+    gap_width: Option<usize>,
 ) {
     let display_count = display_count % MAX_DISPLAYS;
 
     let raw_bits = encode_string(text);
-    let mut display_data_vec: std::vec::Vec<SingleDisplayData> = if max_gap_width > 0 {
-        remove_gaps_in_display_text(&raw_bits, max_gap_width)
+    let mut display_data_vec: std::vec::Vec<SingleDisplayData> = if let Some(gap_width) = gap_width {
+        remove_gaps_in_display_text(&raw_bits, gap_width)
     } else {
         raw_bits
     };
@@ -140,7 +141,11 @@ pub fn show_moving_text_in_loop(
 
 /// Iterates through the data and removes all gaps between symbols. A gap is two or more cols
 /// after each other that are all zero. This way, text looks more natural, as letters are closer
-/// together. Hence, we do not have a monospace font here.
+/// together. Hence, we do not have a monospace font here. But (currently), also spaces are removed.
+///
+/// # Parameters
+/// - `display_data_arr`: Processed Display Data with letters
+/// - `min_gap_size`: Minimum gap size to preserve between symbols
 pub fn remove_gaps_in_display_text(
     display_data_arr: &[SingleDisplayData],
     min_gap_size: usize,
@@ -171,7 +176,7 @@ pub fn remove_gaps_in_display_text(
     let mut count_since_last_not_empty = 0;
     let skip_begin = preserve_at_begin;
     let skip_end = preserve_at_end;
-    let take_elements = display_data_expanded.len() - skip_end - skip_begin;
+    let take_elements = display_data_expanded.len() - skip_end - skip_begin + 1;
 
     // iterate and find gaps in between that can be removed
     for col in display_data_expanded.iter().take(take_elements).copied() {
