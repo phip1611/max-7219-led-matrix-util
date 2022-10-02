@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         rust:
-          - 1.52.1 # MSVR
+          - 1.56.1 # MSVR
           - stable
           - nightly
     steps:
@@ -36,7 +36,7 @@ jobs:
     strategy:
       matrix:
         rust:
-          - 1.52.1 # MSVR
+          - 1.56.1 # MSVR
           - stable
           - nightly
     steps:
