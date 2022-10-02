@@ -8,7 +8,8 @@ use alloc::vec::Vec;
 /// Encodes a char to its bit-representation on a single display. This means a 8x8 bit matrix.
 /// Currently only a very limited alphabet is available and only capital letters. Unknown chars
 /// are mapped to SPACE (empty).
-pub fn encode_char(c: char) -> SingleDisplayData {
+#[allow(clippy::wildcard_in_or_patterns)]
+pub const fn encode_char(c: char) -> SingleDisplayData {
     // currently we only support cap chars
     let c = c.to_ascii_uppercase();
     match c {

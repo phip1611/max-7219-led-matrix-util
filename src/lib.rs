@@ -1,8 +1,24 @@
 //! Provides utility functions on top of "max7219"-crate to display data (like text) on a
 //! MAX7219 powered matrix display.
 
-#![allow(dead_code)]
-#![allow(unused_imports)]
+#![deny(
+    clippy::all,
+    clippy::cargo,
+    clippy::nursery,
+    // clippy::restriction,
+    // clippy::pedantic
+)]
+// now allow a few rules which are denied by the above statement
+// --> they are ridiculous and not necessary
+#![allow(
+    clippy::fallible_impl_from,
+    clippy::needless_doctest_main,
+    clippy::redundant_pub_crate,
+    clippy::suboptimal_flops
+)]
+#![deny(missing_docs)]
+#![deny(missing_debug_implementations)]
+#![deny(rustdoc::all)]
 #![cfg_attr(not(feature = "std"), no_std)]
 #[cfg(not(feature = "std"))]
 #[cfg_attr(not(feature = "std"), macro_use)]
@@ -39,7 +55,7 @@ pub use setup::{setup as setup_adapter, Max7219 as Max7219Adapter};
 ///                 the 8x8 bit data for a single display.
 /// * `repeat` shift 1 bits on the very left to the ending of the vector. Without repeat
 //            the vector will be all zeros after enough iterations.
-pub fn shift_all_rows_one_bit_left(moving_bits: &mut [SingleDisplayData], /*, repeat: bool*/) {
+pub fn shift_all_rows_one_bit_left(moving_bits: &mut [SingleDisplayData] /*, repeat: bool*/) {
     // move all bits to next position
 
     // so we iterate through the whole vector
@@ -126,8 +142,12 @@ pub fn show_moving_text_in_loop(
 
 /// Iterates through the data and removes all gaps between symbols. A gap is two or more cols
 /// after each other that are all zero.
-pub fn remove_gaps_in_display_text(display_data: &[SingleDisplayData], max_gap_size: usize) -> Vec<SingleDisplayData> {
-    let display_data: Vec<SingleDisplayData> = display_data.iter()
+pub fn remove_gaps_in_display_text(
+    display_data: &[SingleDisplayData],
+    max_gap_size: usize,
+) -> Vec<SingleDisplayData> {
+    let display_data: Vec<SingleDisplayData> = display_data
+        .iter()
         .map(|x| transpose_single_display_data(x.clone()))
         .collect();
     let mut display_data_expanded = vec![];
@@ -155,7 +175,6 @@ pub fn remove_gaps_in_display_text(display_data: &[SingleDisplayData], max_gap_s
             break;
         }
     }
-
 
     // keep empty cols at begin
     let mut shrinked_display_data_expanded = vec![0 as u8; preserve_at_begin];
@@ -190,7 +209,8 @@ pub fn remove_gaps_in_display_text(display_data: &[SingleDisplayData], max_gap_s
     }
 
     // transpose again,so that rows become cols again
-    let shrinked_display_data: Vec<SingleDisplayData> = shrinked_display_data_transposed.into_iter()
+    let shrinked_display_data: Vec<SingleDisplayData> = shrinked_display_data_transposed
+        .into_iter()
         .map(|x| transpose_single_display_data(x))
         .collect();
 
@@ -297,7 +317,7 @@ mod tests {
             0b0000_1111,
         ];
 
-        let actual = transpose_single_display_data( input);
+        let actual = transpose_single_display_data(input);
 
         for i in 0..input.len() {
             assert_eq!(
@@ -308,58 +328,36 @@ mod tests {
         }
     }
 
-
-
     #[test]
     fn test_remove_gaps_in_display_text() {
         let vec = vec![
             [
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
+                0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000,
+                0b10000000,
             ],
             [
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-           ]
+                0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000,
+                0b10000000,
+            ],
         ];
         let expected = vec![
             [
+                0b10010000, 0b10010000, 0b10010000, 0b10010000, 0b10010000, 0b10010000, 0b10010000,
                 0b10010000,
-                0b10010000,
-                0b10010000,
-                0b10010000,
-                0b10010000,
-                0b10010000,
-                0b10010000,
-                0b10010000,
-            ],[
+            ],
+            [
                 // TODO remove last if only empty?!
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ]
+                0, 0, 0, 0, 0, 0, 0, 0,
+            ],
         ];
         let actual = remove_gaps_in_display_text(&vec, 2);
         for i in 0..2 {
             for j in 0..8 {
-                assert_eq!(actual[i][j], expected[i][j], "expected: {:#b}, is: {:#b}", expected[i][j], vec[i][j]);
+                assert_eq!(
+                    actual[i][j], expected[i][j],
+                    "expected: {:#b}, is: {:#b}",
+                    expected[i][j], vec[i][j]
+                );
             }
         }
     }

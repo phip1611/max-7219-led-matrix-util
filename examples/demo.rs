@@ -34,6 +34,6 @@ fn main() {
         // ms for each animation step
         50,
         // max_gap_width
-        2
+        2,
     );
 }
