@@ -19,11 +19,13 @@
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
 #![deny(rustdoc::all)]
-#![cfg_attr(not(feature = "std"), no_std)]
-#[cfg(not(feature = "std"))]
-#[cfg_attr(not(feature = "std"), macro_use)]
+#![no_std]
+
+#[cfg(feature = "std")]
+extern crate std;
+
+#[macro_use]
 extern crate alloc;
-#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
 
 #[cfg(feature = "std")]
@@ -32,8 +34,10 @@ use crate::setup::Max7219;
 #[cfg(feature = "std")]
 use std::{thread::sleep, time::Duration};
 
+#[cfg(feature = "std")]
 use crate::encoding::encode_string;
 use crate::mappings::SingleDisplayData;
+#[cfg(feature = "std")]
 use max7219::DecodeMode;
 
 /// We use 8x8 square matrices (per single display)
@@ -123,7 +127,7 @@ pub fn show_moving_text_in_loop(
     let display_count = display_count % MAX_DISPLAYS;
 
     let raw_bits = encode_string(text);
-    let mut display_data_vec: std::vec::Vec<SingleDisplayData> = if let Some(gap_width) = gap_width {
+    let mut display_data_vec: Vec<SingleDisplayData> = if let Some(gap_width) = gap_width {
         remove_gaps_in_display_text(&raw_bits, gap_width)
     } else {
         raw_bits
@@ -149,10 +153,10 @@ pub fn show_moving_text_in_loop(
 pub fn remove_gaps_in_display_text(
     display_data_arr: &[SingleDisplayData],
     min_gap_size: usize,
-) -> std::vec::Vec<SingleDisplayData> {
+) -> Vec<SingleDisplayData> {
     // all data in one single vector; each SingleDisplayData is transposed at first
     // => the vector contains all pixels but in (col1, colX, colN)-order.
-    let display_data_expanded: std::vec::Vec<u8> = display_data_arr
+    let display_data_expanded: Vec<u8> = display_data_arr
         .iter()
         // transpose: rows become cols
         .map(transpose_single_display_data)

@@ -2,7 +2,6 @@
 //! MAX7219-powered LED matrix.
 
 use crate::mappings::*;
-#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
 
 /// Encodes a char to its bit-representation on a single display. This means a 8x8 bit matrix.
