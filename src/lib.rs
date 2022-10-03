@@ -1,13 +1,31 @@
 //! Provides utility functions on top of "max7219"-crate to display data (like text) on a
 //! MAX7219 powered matrix display.
 
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![cfg_attr(not(feature = "std"), no_std)]
-#[cfg(not(feature = "std"))]
-#[cfg_attr(not(feature = "std"), macro_use)]
+#![deny(
+    clippy::all,
+    clippy::cargo,
+    clippy::nursery,
+    // clippy::restriction,
+    // clippy::pedantic
+)]
+// now allow a few rules which are denied by the above statement
+// --> they are ridiculous and not necessary
+#![allow(
+    clippy::fallible_impl_from,
+    clippy::needless_doctest_main,
+    clippy::redundant_pub_crate,
+    clippy::suboptimal_flops
+)]
+#![deny(missing_docs)]
+#![deny(missing_debug_implementations)]
+#![deny(rustdoc::all)]
+#![no_std]
+
+#[cfg(feature = "std")]
+extern crate std;
+
+#[macro_use]
 extern crate alloc;
-#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
 
 #[cfg(feature = "std")]
@@ -16,8 +34,10 @@ use crate::setup::Max7219;
 #[cfg(feature = "std")]
 use std::{thread::sleep, time::Duration};
 
+#[cfg(feature = "std")]
 use crate::encoding::encode_string;
 use crate::mappings::SingleDisplayData;
+#[cfg(feature = "std")]
 use max7219::DecodeMode;
 
 /// We use 8x8 square matrices (per single display)
@@ -39,7 +59,7 @@ pub use setup::{setup as setup_adapter, Max7219 as Max7219Adapter};
 ///                 the 8x8 bit data for a single display.
 /// * `repeat` shift 1 bits on the very left to the ending of the vector. Without repeat
 //            the vector will be all zeros after enough iterations.
-pub fn shift_all_rows_one_bit_left(moving_bits: &mut [SingleDisplayData], /*, repeat: bool*/) {
+pub fn shift_all_rows_one_bit_left(moving_bits: &mut [SingleDisplayData] /*, repeat: bool*/) {
     // move all bits to next position
 
     // so we iterate through the whole vector
@@ -94,110 +114,116 @@ pub fn prepare_display(display: &mut Max7219, display_count: usize, intensity: u
 /// * `text` - the text to display
 /// * `display_count` - count of displays connected to the MAX7219
 /// * `ms_sleep` - timeout after each iteration
-/// * `max_gap_width` - set's the maximum width/count of empty cols between characters. Recommended is 2. 0 to deactivate.
+/// * `gap_width` - (optional) set's the maximum width/count of empty cols between characters. 0 to deactivate.
+///                 Downside is that spaces will be removed.
 #[cfg(feature = "std")]
 pub fn show_moving_text_in_loop(
     display: &mut Max7219,
     text: &str,
     display_count: usize,
     ms_sleep: u64,
-    max_gap_width: usize,
+    gap_width: Option<usize>,
 ) {
     let display_count = display_count % MAX_DISPLAYS;
 
     let raw_bits = encode_string(text);
-    let mut display_bits;
-    if max_gap_width > 0 {
-        display_bits = remove_gaps_in_display_text(&raw_bits, max_gap_width);
+    let mut display_data_vec: Vec<SingleDisplayData> = if let Some(gap_width) = gap_width {
+        remove_gaps_in_display_text(&raw_bits, gap_width)
     } else {
-        display_bits = raw_bits;
-    }
+        raw_bits
+    };
 
     loop {
-        for i in 0..display_count {
-            display.write_raw(i, &display_bits[i]).unwrap();
+        for (i, display_data) in display_data_vec.iter().enumerate().take(display_count) {
+            display.write_raw(i, display_data).unwrap();
         }
-
         sleep(Duration::from_millis(ms_sleep));
         // shift all rows one bit to the left
-        shift_all_rows_one_bit_left(&mut display_bits);
+        shift_all_rows_one_bit_left(&mut display_data_vec);
     }
 }
 
 /// Iterates through the data and removes all gaps between symbols. A gap is two or more cols
-/// after each other that are all zero.
-pub fn remove_gaps_in_display_text(display_data: &[SingleDisplayData], max_gap_size: usize) -> Vec<SingleDisplayData> {
-    let display_data: Vec<SingleDisplayData> = display_data.iter()
-        .map(|x| transpose_single_display_data(x.clone()))
+/// after each other that are all zero. This way, text looks more natural, as letters are closer
+/// together. Hence, we do not have a monospace font here. But (currently), also spaces are removed.
+///
+/// # Parameters
+/// - `display_data_arr`: Processed Display Data with letters
+/// - `min_gap_size`: Minimum gap size to preserve between symbols
+pub fn remove_gaps_in_display_text(
+    display_data_arr: &[SingleDisplayData],
+    min_gap_size: usize,
+) -> Vec<SingleDisplayData> {
+    // all data in one single vector; each SingleDisplayData is transposed at first
+    // => the vector contains all pixels but in (col1, colX, colN)-order.
+    let display_data_expanded: Vec<u8> = display_data_arr
+        .iter()
+        // transpose: rows become cols
+        .map(transpose_single_display_data)
+        .flat_map(|display_data| display_data.into_iter())
         .collect();
-    let mut display_data_expanded = vec![];
-    for x in &display_data {
-        for y in x {
-            display_data_expanded.push(y);
-        }
-    }
 
-    let mut preserve_at_begin = 0;
-    let mut preserve_at_end = 0;
-    for i in 0..display_data_expanded.len() {
-        if *display_data_expanded[i] == 0 {
-            preserve_at_begin += 1;
-        } else {
-            break;
-        }
-    }
-    for i in 0..display_data_expanded.len() {
-        // go backwards
-        let i = display_data_expanded.len() - 1 - i;
-        if *display_data_expanded[i] == 0 {
-            preserve_at_end += 1;
-        } else {
-            break;
-        }
-    }
+    let preserve_at_begin = display_data_expanded
+        .iter()
+        .take_while(|col| **col == 0)
+        .count();
+    let preserve_at_end = display_data_expanded
+        .iter()
+        .rev()
+        .take_while(|col| **col == 0)
+        .count();
 
-
-    // keep empty cols at begin
-    let mut shrinked_display_data_expanded = vec![0 as u8; preserve_at_begin];
+    // This variable holds the whole display data (col1, colX, ..., colN) but with
+    // removed gaps in between. We keep empty cols at the begin.
+    let mut shrinked_display_data_expanded = vec![0_u8; preserve_at_begin];
 
     let mut count_since_last_not_empty = 0;
-    for i in preserve_at_begin..display_data_expanded.len() - preserve_at_end {
-        if *display_data_expanded[i] == 0 {
+    let skip_begin = preserve_at_begin;
+    let skip_end = preserve_at_end;
+    let take_elements = display_data_expanded.len() - skip_end - skip_begin + 1;
+
+    // iterate and find gaps in between that can be removed
+    for col in display_data_expanded.iter().take(take_elements).copied() {
+        if col == 0 {
             count_since_last_not_empty += 1;
         } else {
             count_since_last_not_empty = 0;
         }
 
-        if count_since_last_not_empty <= max_gap_size {
-            shrinked_display_data_expanded.push(*display_data_expanded[i]);
+        // we preserve `min_gap_size` empty cols, after that, we skip them
+        if count_since_last_not_empty <= min_gap_size {
+            shrinked_display_data_expanded.push(col);
         }
     }
+
     // keep empty cols at end
     shrinked_display_data_expanded.extend_from_slice(&vec![0; preserve_at_end]);
 
     // now transform again to Vec<SingleDisplayData>
     // 1) check if length is multiple of eight
-    let add_to_be_divider_of_8 = 8 - (shrinked_display_data_expanded.len() % 8);
-    shrinked_display_data_expanded.extend_from_slice(&vec![0; add_to_be_divider_of_8]);
+    let add_to_multiple_of_8 = 8 - (shrinked_display_data_expanded.len() % 8);
+    shrinked_display_data_expanded.extend_from_slice(&vec![0; add_to_multiple_of_8]);
 
-    let mut shrinked_display_data_transposed: Vec<SingleDisplayData> = vec![];
-    for i in (0..shrinked_display_data_expanded.len()).step_by(8) {
-        let mut slice: SingleDisplayData = [0; 8];
-        for j in 0..8 {
-            slice[j] = shrinked_display_data_expanded[i + j];
-        }
-        shrinked_display_data_transposed.push(slice);
-    }
-
-    // transpose again,so that rows become cols again
-    let shrinked_display_data: Vec<SingleDisplayData> = shrinked_display_data_transposed.into_iter()
-        .map(|x| transpose_single_display_data(x))
+    // display data without gaps in-between ready for display.
+    let shrinked_display_data = shrinked_display_data_expanded
+        .as_slice()
+        .chunks_exact(8)
+        .map(|cols_8| {
+            // transform to u8 array of length 8
+            let mut transposed_display: SingleDisplayData = [0; 8];
+            cols_8
+                .iter()
+                .copied()
+                .enumerate()
+                .for_each(|(i, col)| transposed_display[i] = col);
+            transpose_single_display_data(&transposed_display)
+        })
         .collect();
 
     shrinked_display_data
 }
 
-/// This does a transpose operation on the `SingleDisplayData`-Matrix and is a helper function for
+/// This does a transpose operation on the [`SingleDisplayData`]-Matrix and is a helper function for
 /// [`remove_gaps_in_display_text`]. Cols become rows and rows become cols.
 /// Example:
 /// ```
@@ -226,7 +252,8 @@ pub fn remove_gaps_in_display_text(display_data: &[SingleDisplayData], max_gap_s
 /// 0,
 /// ];
 /// ```
-pub fn transpose_single_display_data(data: SingleDisplayData) -> SingleDisplayData {
+#[allow(clippy::needless_range_loop)]
+pub fn transpose_single_display_data(data: &SingleDisplayData) -> SingleDisplayData {
     let mut transposed_data: SingleDisplayData = [0; 8];
     for col_i in 0..8 {
         // the data/bits of the current col
@@ -297,7 +324,7 @@ mod tests {
             0b0000_1111,
         ];
 
-        let actual = transpose_single_display_data( input);
+        let actual = transpose_single_display_data(&input);
 
         for i in 0..input.len() {
             assert_eq!(
@@ -308,58 +335,36 @@ mod tests {
         }
     }
 
-
-
     #[test]
     fn test_remove_gaps_in_display_text() {
         let vec = vec![
             [
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
+                0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000,
+                0b10000000,
             ],
             [
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-               0b10000000,
-           ]
+                0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000,
+                0b10000000,
+            ],
         ];
         let expected = vec![
             [
+                0b10010000, 0b10010000, 0b10010000, 0b10010000, 0b10010000, 0b10010000, 0b10010000,
                 0b10010000,
-                0b10010000,
-                0b10010000,
-                0b10010000,
-                0b10010000,
-                0b10010000,
-                0b10010000,
-                0b10010000,
-            ],[
+            ],
+            [
                 // TODO remove last if only empty?!
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ]
+                0, 0, 0, 0, 0, 0, 0, 0,
+            ],
         ];
         let actual = remove_gaps_in_display_text(&vec, 2);
         for i in 0..2 {
             for j in 0..8 {
-                assert_eq!(actual[i][j], expected[i][j], "expected: {:#b}, is: {:#b}", expected[i][j], vec[i][j]);
+                assert_eq!(
+                    actual[i][j], expected[i][j],
+                    "expected: {:#b}, is: {:#b}",
+                    expected[i][j], vec[i][j]
+                );
             }
         }
     }

@@ -1,7 +1,7 @@
 # Util library for MAX7219-powered LED matrix displays written in Rust for Linux (Raspberry Pi).
 
 This is a `no_std` utility library on top of `max7219`-crate that allows you to easily display
-text on dot matrix displays. **The main purpose of this lib is educational. There aren't mappings for all chars yet!** 
+text on dot matrix displays. **The main purpose of this lib is educational. There aren't mappings for all chars yet!**
 Feel free to contribute on [Github](https://github.com/phip1611/max-7219-led-matrix-util)!
 
 ## `no_std` support vs usage on Raspberry Pi
@@ -57,6 +57,8 @@ fn main() {
 }
 ```
 
+### MSRV
+The MSRV is `1.56.1`.
 
 ### Thanks to
 Thanks to the creators of the `max7219`-crate!

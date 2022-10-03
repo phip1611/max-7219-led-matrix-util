@@ -7,7 +7,8 @@ use max7219::MAX7219;
 pub type Max7219 = MAX7219<PinConnector<LHandle, LHandle, LHandle>>;
 
 // setup glue structure between crates "embedded_hal", "gpio_cdev" and "max7219 "
-/// Wrapper around `gpio_cdev::LineHandle` that implements `embedded_hal::digital::v2::OutputPin`.
+/// Wrapper around [`gpio_cdev::LineHandle`] that implements [`embedded_hal::digital::v2::OutputPin`].
+#[derive(Debug)]
 pub struct LHandle(LineHandle);
 impl OutputPin for LHandle {
     type Error = ();

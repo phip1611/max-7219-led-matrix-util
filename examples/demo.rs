@@ -29,11 +29,11 @@ fn main() {
     prepare_display(&mut display, NUM_DISPLAYS, 0x0F);
     show_moving_text_in_loop(
         &mut display,
-        "HELLO 01 ABCDEF MAPA   ",
+        "HALLO LEON!!!  ",
         NUM_DISPLAYS,
         // ms for each animation step
         50,
-        // max_gap_width
-        2
+        // gap_width
+        None,
     );
 }
